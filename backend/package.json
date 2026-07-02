@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/LeonH011iz/Scouting-Website--2027#readme",
   "dependencies": {
+    "cors": "^2.8.6",
     "express": "^5.2.1"
   }
 }

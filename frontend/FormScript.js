@@ -2,7 +2,7 @@
 //Assuming the file is downloaded and on your desktop
 //This is more as a reminder for me to remember how to open this
 //It will probobly be different for you
-//$ cd ~/Desktop/robotics\ Scouting\ form
+//$ cd ~/Desktop/robotics-scouting-form
 //$ npx serve
 //Then go to http://localhost:3000 
 //Then click on the html file!
