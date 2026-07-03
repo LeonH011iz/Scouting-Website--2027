@@ -9,7 +9,6 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'frontend/HomePage.html'));
 });
 
-
 app.use(express.static(path.join('..','frontend'))); //applys the css and javascript to the html
 
 app.get('/form', (req, res) => {
@@ -18,5 +17,5 @@ app.get('/form', (req, res) => {
  
 // Start the server
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`Scouting Website listening at http://localhost:${port}`);
 });
