@@ -1,18 +1,38 @@
 /*TODO make CSS to make ratings look like stars*/
 /*Don't judge me please im bad at css*/
 body {
-    background-color: #1a91c0;
-    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    
 }
 
 h3 {
-    color: rgb(37, 22, 239);
+    color: #0067c6;
+    font-family: "League Spartan", sans-serif;
 }
 
 h2{
-    color:rgb(5, 47, 138);
+    color:#0067c6;
+    font-family: "League Spartan", sans-serif;
+}
+
+h1{
+    color: #0067c6;
+    font-family:"League Spartan", sans-serif;
 }
 
 .question {
+    color: #222222;
     font-weight: bold;
+    font-family: "Source Sans 3", sans-serif;
+
+}
+p{
+    font-family: "Source Sans 3", sans-serif;
+
+}
+
+label{
+    font-family: "Source Sans 3", sans-serif;
+    font-weight: 300;
+    color: #9aa5ae;
 }

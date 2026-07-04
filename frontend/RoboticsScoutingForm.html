@@ -6,16 +6,22 @@
     <title>Robotics Scouting Website</title>
 
     <link rel="stylesheet" href="FormStyles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;700&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet">
+
+
 </head> 
 
 <body>
     <h2>Robotics Scouting Form</h2> 
 
     <form autocomplete="off" id="scoutingForm" action="/submit-form" method="POST">
-        <label for="email">Please enter your email:</label><br>
+        <label for="email" class="question">Please enter your email:</label><br>
         <input type="email" id="email" name="email" required autofocus autocomplete="on"><br><br>
 
-        <label for="comp">Which Comp is this:</label><br>
+        <label for="comp" class="question">Which Comp is this:</label><br>
         <select id="comp" name ="comp" required>
             <option value="" disabled selected hidden>Please pick an option</option>
             <option value="ventura">CA District Ventura County Event 2026</option>
@@ -33,7 +39,7 @@
             <input type="radio" name="teamColor" value="blue">Blue
         </label><br><br>
 
-        <label for="team">Team Number</label><br>
+        <label for="team" class="question">Team Number</label><br>
 
         <select name="team" id="team"required>
             <option value="" disabled selected hidden>
