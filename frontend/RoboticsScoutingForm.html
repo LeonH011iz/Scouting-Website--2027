@@ -15,6 +15,8 @@
 </head> 
 
 <body>
+    <button onclick="location.href='/'">back</button>
+    <br>
     <h2>Robotics Scouting Form</h2> 
 
     <form autocomplete="off" id="scoutingForm" action="/submit-form" method="POST">
@@ -24,19 +26,19 @@
         <label for="comp" class="question">Which Comp is this:</label><br>
         <select id="comp" name ="comp" required>
             <option value="" disabled selected hidden>Please pick an option</option>
-            <option value="ventura">CA District Ventura County Event 2026</option>
-            <option value="SGV">CA District San Gabriel Valley Event 2026</option>
-            <option value="SoCalCamp">FIRST California Southern State Championship presented by Qualcomm 2026</option>
+            <option value="CA District Ventura County Event 2026">CA District Ventura County Event 2026</option>
+            <option value="CA District San Gabriel Valley Event 2026">CA District San Gabriel Valley Event 2026</option>
+            <option value="FIRST California Southern State Championship presented by Qualcomm 2026">FIRST California Southern State Championship presented by Qualcomm 2026</option>
         </select><br>
 
         <p class="question">Red or Blue?</p>
 
         <label style="color:RED">
-            <input type="radio" name="teamColor" value="red" required>Red
+            <input type="radio" name="teamColor" value="Red" required>Red
         </label><br>
 
         <label style="color:BLUE">
-            <input type="radio" name="teamColor" value="blue">Blue
+            <input type="radio" name="teamColor" value="Blue">Blue
         </label><br><br>
 
         <label for="team" class="question">Team Number</label><br>
@@ -53,22 +55,22 @@
         <p class="question"> Where did they go in auto?</p>
 
         <label>
-            <input type="checkbox" name="autoLocation" value="nowhere">Nowhere
+            <input type="checkbox" name="autoLocation" value="Nowhere">Nowhere
         </label><br>
         <label>
-            <input type="checkbox" name="autoLocation" value="depot">Depot
+            <input type="checkbox" name="autoLocation" value="Depot">Depot
         </label><br>
         <label>
-            <input type="checkbox" name="autoLocation" value="neutralZone">Neutral Zone
+            <input type="checkbox" name="autoLocation" value="NeutralZone">Neutral Zone
         </label><br>
         <label>
             <input type="checkbox" name="autoLocation" value="humanPlayerStation">Human Player Station
         </label><br>
         <label>
-            <input type="checkbox" name="autoLocation" value="hub">The Hub
+            <input type="checkbox" name="autoLocation" value="Hub">The Hub
         </label><br>
         <label>
-            <input type="checkbox" name="autoLocation" value="tower">The Tower
+            <input type="checkbox" name="autoLocation" value="Tower">The Tower
         </label><br>
         <label>
             <input type="checkbox" name="autoLocation" id="otherAutoLoc">Other
@@ -129,19 +131,19 @@
 
         <p class="question">Rate how good accurate they were at aiming out of 5.</p>
         <label> <!--TODO make CSS to make it look like a star-->
-            <input type="radio" name="aimRaiting" class="star" value="1" required>1
+            <input type="radio" name="aimRating" class="star" value="1" required>1
         </label>
         <label> 
-            <input type="radio" name="aimRaiting" class="star" value="2">2
+            <input type="radio" name="aimRating" class="star" value="2">2
         </label>
         <label> 
-            <input type="radio" name="aimRaiting" class="star" value="3">3
+            <input type="radio" name="aimRating" class="star" value="3">3
         </label>
         <label> 
-            <input type="radio" name="aimRaiting" class="star" value="4">4
+            <input type="radio" name="aimRating" class="star" value="4">4
         </label>
         <label> 
-            <input type="radio" name="aimRaiting" class="star" value="5">5
+            <input type="radio" name="aimRating" class="star" value="5">5
         </label><br>
 
          <p class="question">Rate the speed for them to get a full hopper intake out of 5.</p>

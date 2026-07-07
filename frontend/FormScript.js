@@ -17,7 +17,7 @@ fetch(teamList) //Gathers the teamList from the csv file and puts it into the sl
 
 	for(let i = 1; i < lines.length; i++){
         const values = lines[i].split(',');
-        const teamNumber = values[0];
+        const teamNumber = values[0] + " - " + values[1];
 
         if(teamNumber){
             const option = document.createElement("option");

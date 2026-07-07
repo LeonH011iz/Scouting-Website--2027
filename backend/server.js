@@ -20,9 +20,14 @@ app.get('/form', (req, res) => {
  res.sendFile(path.join(__dirname, '..', 'frontend/RoboticsScoutingForm.html')); //opens the html at /fr
 });
 
+app.get('/table', (req, res) => {
+ res.sendFile(path.join(__dirname, '..', 'frontend/table.html')); 
+});
+
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/data', (req, res) =>  {
+        //db.prepare(`DELETE FROM scoutingData`).all();
         const data = db.prepare(`SELECT * FROM scoutingData`).all(); 
         console.table(data);
         res.json(data); 
@@ -32,14 +37,16 @@ app.post('/submit-form', (req, res) => {
     let email = req.body.email; //gets all of the values and converts 
     let comp = req.body.comp; //arrays to strings and filters blank values when neccesary
     let teamColor = req.body.teamColor;
-    let team = Number(req.body.team);
+    let teamCall = req.body.team.split(" - ");
+    let teamNumber = Number(teamCall[0]);
+    let teamName = teamCall[1];
     let autoLocation = req.body.autoLocation.filter(item => item !== "");
     autoLocation = JSON.stringify(autoLocation);
     let autoDo = req.body.autoDo
     if (!Array.isArray(autoDo)) { //this turns non arrays to arrays 
         autoDo = [autoDo]; //we do this because having all arrays of varying lengths including lengths of 1
     }//is better than haing some arrays of varying lengths and some non arrays 
-    autoDo.filter(item => item !== ""); //I only have to do this for checkboxes without an "other" option 
+    autoDo = autoDo.filter(item => item !== ""); //I only have to do this for checkboxes without an "other" option 
     autoDo = JSON.stringify(autoDo);
     let role = req.body.role.filter(item => item !== "");
     role = JSON.stringify(role);
@@ -52,7 +59,7 @@ app.post('/submit-form', (req, res) => {
     if(!Array.isArray(travel)){
         travel = [travel];
     }
-    travel.filter(item => item !== "");
+    travel = travel.filter(item => item !== "");
     travel = JSON.stringify(travel);
     let climb = req.body.climb.filter(item => item !== "");
     climb = JSON.stringify(climb);
@@ -67,12 +74,15 @@ app.post('/submit-form', (req, res) => {
         notes = null; //replaces whitespace with nothing
     }
 
+
+
 const stmt = db.prepare(`
 INSERT INTO scoutingData (
     email,
     comp,
     teamColor,
-    team,
+    teamNumber,
+    teamName,
     autoLocation,
     autoDo,
     role,
@@ -89,7 +99,7 @@ INSERT INTO scoutingData (
     notes
 )
 VALUES (
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 )
 `);
     
@@ -97,7 +107,8 @@ stmt.run(
     email,
     comp,
     teamColor,
-    team,
+    teamNumber,
+    teamName,
     autoLocation,
     autoDo,
     role,
@@ -132,7 +143,8 @@ CREATE TABLE IF NOT EXISTS scoutingData (
     email TEXT,
     comp TEXT,
     teamColor TEXT,
-    team INTEGER,
+    teamNumber INTEGER,
+    teamName TEXT,
     autoLocation TEXT, 
     autoDo TEXT,
     role TEXT,
