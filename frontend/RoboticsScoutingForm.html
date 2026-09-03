@@ -19,9 +19,9 @@
     <br>
     <h2>Robotics Scouting Form</h2> 
 
-    <form autocomplete="off" id="scoutingForm" action="/submit-form" method="POST">
+    <form id="scoutingForm" action="/submit-form" method="POST">
         <label for="email" class="question">Please enter your email:</label><br>
-        <input type="email" id="email" name="email" required autofocus autocomplete="on"><br><br>
+        <input type="email" id="email" placeholder="example@email.com" name="email" required autofocus autocomplete="email"><br><br>
 
         <label for="comp" class="question">Which Comp is this:</label><br>
         <select id="comp" name ="comp" required>

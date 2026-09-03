@@ -24,7 +24,107 @@ app.get('/table', (req, res) => {
  res.sendFile(path.join(__dirname, '..', 'frontend/table.html')); 
 });
 
+app.get('/organized-Table-Test', (req, res) => {
+     res.sendFile(path.join(__dirname, '..', 'frontend/table2.html')); 
+});
+
 app.use(express.urlencoded({ extended: true }));
+
+app.get('/data2', (req, res) => {
+    const comp = "FIRST California Southern State Championship presented by Qualcomm 2026"; 
+    //That is a testing value comp
+    const data2 = db.prepare(`
+        WITH auto_location AS (
+            SELECT 
+            a.teamNumber,
+            a.teamNumber || ' - ' || a.teamName AS team,
+            al.value AS autoLocation,
+            count(*) as autoLoc_count
+         From scoutingData a,
+            json_each(a.autoLocation) al
+         WHERE a.comp = ? 
+         GROUP BY a.teamNumber, a.teamName, al.value
+        ),
+
+       auto_location_totals AS (
+            SELECT
+                team,
+                SUM(autoLoc_count) AS total
+            FROM auto_location
+            GROUP BY team
+        ),
+
+        auto_do AS (
+            SELECT
+            aa.teamNumber,
+            aa.teamNumber || ' - ' || aa.teamName AS team,
+            ad.value AS autoDo,
+            count(*) as autoDo_count
+            From scoutingData aa,
+                json_each(aa.autoDo) ad
+            WHERE aa.comp = ?
+           GROUP BY aa.teamNumber, aa.teamName, ad.value
+        ),
+
+        auto_do_totals AS (
+            SELECT 
+                team, 
+                SUM(autoDo_count) AS total
+            FROM auto_do
+            GROUP BY team
+        ),
+
+        auto_location_combined AS (
+        SELECT
+            auto_location.teamNumber,
+            auto_location.team,
+            GROUP_CONCAT(
+                auto_location.autoLocation || ': ' ||
+                ROUND(
+                    auto_location.autoLoc_count * 100.0
+                    / auto_location_totals.total,
+                    2
+                ) || '%'
+            ) AS autoLocation
+        FROM auto_location
+        JOIN auto_location_totals
+            ON auto_location.team = auto_location_totals.team
+        GROUP BY auto_location.team
+    ),
+
+    auto_do_combined AS (
+        SELECT
+            auto_do.teamNumber,
+            auto_do.team,
+            GROUP_CONCAT(
+                auto_do.autoDo || ': ' ||
+                ROUND(
+                    auto_do.autoDo_count * 100.0
+                    / auto_do_totals.total,
+                    2
+                ) || '%'
+            ) AS autoDo
+        FROM auto_do
+        JOIN auto_do_totals
+            ON auto_do.team = auto_do_totals.team
+        GROUP BY auto_do.team
+    )
+
+        SELECT
+        auto_location_combined.teamNumber,
+        auto_location_combined.team AS team,
+        auto_location_combined.autoLocation,
+        auto_do_combined.autoDo
+
+        FROM auto_location_combined
+
+        JOIN auto_do_combined
+            ON auto_location_combined.team = auto_do_combined.team
+
+        ORDER BY auto_location_combined.teamNumber
+        `).all(comp, comp)
+        res.json(data2);
+});
 
 app.get('/data', (req, res) =>  {
         //db.prepare(`DELETE FROM scoutingData`).all();
