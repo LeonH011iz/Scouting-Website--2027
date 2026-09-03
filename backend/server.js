@@ -25,13 +25,26 @@ app.get('/table', (req, res) => {
 });
 
 app.get('/organized-Table-Test', (req, res) => {
-     res.sendFile(path.join(__dirname, '..', 'frontend/table2.html')); 
+     res.sendFile(path.join(__dirname, '..', 'frontend/search.html')); 
 });
 
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/data2', (req, res) => {
-    const comp = "FIRST California Southern State Championship presented by Qualcomm 2026"; 
+app.post('/search-submit', (req, res) => {
+    const comp = req.body.comp;
+
+    res.redirect('/table2?comp=' + encodeURIComponent(comp));
+});
+
+app.get('/search-submit', (req, res) => {
+    const comp = req.query.comp;
+
+    const data2 = getSearchData(comp);
+
+    res.json(data2);
+});
+
+function getSearchData(comp){
     //That is a testing value comp
     const data2 = db.prepare(`
         WITH auto_location AS (
@@ -123,9 +136,13 @@ app.get('/data2', (req, res) => {
 
         ORDER BY auto_location_combined.teamNumber
         `).all(comp, comp)
-        res.json(data2);
-});
 
+        return(data2);
+    }
+
+app.get('/table2', (req, res) => {
+ res.sendFile(path.join(__dirname, '..', 'frontend/table2.html')); 
+});
 app.get('/data', (req, res) =>  {
         //db.prepare(`DELETE FROM scoutingData`).all();
         const data = db.prepare(`SELECT * FROM scoutingData`).all(); 
@@ -229,10 +246,7 @@ stmt.run(
 });
 
  
-// Start the server
-app.listen(port, () => {
-  console.log(`Scouting Website listening at http://localhost:${port}`);
-});
+
 
 
 
@@ -262,3 +276,7 @@ CREATE TABLE IF NOT EXISTS scoutingData (
 )
 `).run();
 
+// Start the server
+app.listen(port, () => {
+  console.log(`Scouting Website listening at http://localhost:${port}`);
+});

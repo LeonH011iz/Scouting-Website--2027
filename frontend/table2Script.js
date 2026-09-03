@@ -1,23 +1,24 @@
 const table = document.getElementById("tableBody");
 
-fetch("/data2")
+const params = new URLSearchParams(window.location.search);
+const comp = params.get("comp");
+
+fetch("/search-submit?comp=" + encodeURIComponent(comp))
     .then(response => response.json())
     .then(data => {
 
         console.log(data);
 
+        data.forEach(row => {
+            table.innerHTML += `
+                <tr>
+                    <td>${row.team}</td>
+                    <td>${row.autoLocation.replaceAll(',', ' ')}</td>
+                    <td>${row.autoDo.replaceAll(',', ' ')}</td>
+                </tr>
+            `;
+        });
 
-data.forEach(row => {
-
-    table.innerHTML += `
-        <tr>
-            <td>${row.team}</td>
-            <td>${row.autoLocation.replaceAll(',', ' ')}</td>
-            <td>${row.autoDo.replaceAll(',', ' ')}</td>
-        </tr>
-    `;
-
-});
     });
 
 

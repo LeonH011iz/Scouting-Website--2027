@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="table.css">
+
+        <title>Search</title>
+        
+    </head>
+    <body>
+        <button onclick="location.href='/'">Back</button>
+        <br>
+        <br>
+       <form id="searchBar" action="/search-submit" method="POST">
+            <select id="comp" name ="comp" required>
+                <option value="" disabled selected hidden>Please pick an option</option>
+                <option value="CA District Ventura County Event 2026">CA District Ventura County Event 2026</option>
+                <option value="CA District San Gabriel Valley Event 2026">CA District San Gabriel Valley Event 2026</option>
+                <option value="FIRST California Southern State Championship presented by Qualcomm 2026">FIRST California Southern State Championship presented by Qualcomm 2026</option>
+            </select><br>
+            <button type="submit">Submit</button>
+        </form>
+    </body>
+</html>
