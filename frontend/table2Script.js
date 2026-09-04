@@ -15,19 +15,17 @@ fetch("/search-submit?comp=" + encodeURIComponent(comp))
                     <td>${row.team}</td>
                     <td>${row.autoLocation.replaceAll(',', ' ')}</td>
                     <td>${row.autoDo.replaceAll(',', ' ')}</td>
+                    <td>${row.role.replaceAll(',', ' ')}</td>
+                    <td>${row.roleRating + "/5"}</td>   
+                    <td>${row.aimRating + "/5"}</td>
+                    <td>${row.hopperRating + "/5"}</td>    
+                    <td>${row.shootRating + "/5"}</td>        
                 </tr>
             `;
         });
 
     });
-
-
-/*
-            <td>${row.role}</td>
-            <td>${row.roleRating}</td>
-            <td>${row.aimRating}</td>
-            <td>${row.hopperRating}</td>
-            <td>${row.shootRating}</td>
+        /*  
             <td>${row.carry}</td>
             <td>${row.travel}</td>
             <td>${row.climb}</td>
@@ -35,9 +33,5 @@ fetch("/search-submit?comp=" + encodeURIComponent(comp))
             <td>${row.disabled}</td>
             <td>${row.dq}</td>
             <td>${row.notes}</td> 
-        </tr>
-        `;
-
-    });
-});
+        
 */

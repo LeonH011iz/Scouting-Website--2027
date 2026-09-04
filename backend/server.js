@@ -87,6 +87,66 @@ function getSearchData(comp){
             GROUP BY team
         ),
 
+        robot_role AS (
+            SELECT
+            r.teamNumber,
+            r.teamNumber || ' - ' || r.teamName AS team,
+            rp.value AS role,
+            count(*) as role_count
+            From scoutingData r,
+                json_each(r.role) rp
+            WHERE r.comp = ?
+            GROUP BY r.teamNumber, r.teamName, rp.value
+        ),
+
+        robot_role_totals AS (
+            SELECT
+                team,
+                SUM(role_count) AS total
+            FROM robot_role
+            GROUP BY team
+        ),
+
+        role_rating AS (
+            SELECT
+                rr.teamNumber,
+                rr.teamNumber || ' - ' || rr.teamName AS team,
+                ROUND(AVG(roleRating), 2) AS roleRating
+            FROM scoutingData rr
+            WHERE rr.comp = ?
+            GROUP BY rr.teamNumber, rr.teamName
+        ),
+
+        aim_rating AS (
+            SELECT
+                ar.teamNumber,
+                ar.teamNumber || ' - ' || ar.teamName AS team,
+                ROUND(AVG(aimRating), 2) AS aimRating
+            FROM scoutingData ar
+            WHERE ar.comp = ?
+            GROUP BY ar.teamNumber, ar.teamName
+        ),
+
+        hopper_rating AS (
+            SELECT
+                hr.teamNumber,
+                hr.teamNumber || ' - ' || hr.teamName AS team,
+                ROUND(AVG(hopperRating), 2) AS hopperRating
+            FROM scoutingData hr
+            WHERE hr.comp = ?
+            GROUP BY hr.teamNumber, hr.teamName
+        ),
+
+        shoot_rating AS (
+            SELECT
+                sr.teamNumber,
+                sr.teamNumber || ' - ' || sr.teamName AS team,
+                ROUND(AVG(shootRating), 2) AS shootRating
+            FROM scoutingData sr
+            WHERE sr.comp = ?
+            GROUP BY sr.teamNumber, sr.teamName
+        ),
+
         auto_location_combined AS (
         SELECT
             auto_location.teamNumber,
@@ -121,21 +181,59 @@ function getSearchData(comp){
         JOIN auto_do_totals
             ON auto_do.team = auto_do_totals.team
         GROUP BY auto_do.team
-    )
+        ),
+
+        robot_role_combined AS (
+            SELECT
+                robot_role.teamNumber,
+                robot_role.team,
+                GROUP_CONCAT(
+                    robot_role.role || ': ' ||
+                    ROUND(
+                        robot_role.role_count * 100.0
+                        / robot_role_totals.total,
+                        2
+                    ) || '%'
+                ) AS role
+            FROM robot_role
+            JOIN robot_role_totals
+                ON robot_role.team = robot_role_totals.team
+            GROUP BY robot_role.team
+        )
 
         SELECT
         auto_location_combined.teamNumber,
         auto_location_combined.team AS team,
         auto_location_combined.autoLocation,
-        auto_do_combined.autoDo
+        auto_do_combined.autoDo,
+        robot_role_combined.role,
+        role_rating.roleRating,
+        aim_rating.aimRating,
+        hopper_rating.hopperRating,
+        shoot_rating.shootRating
 
         FROM auto_location_combined
 
-        JOIN auto_do_combined
+        LEFT JOIN auto_do_combined
             ON auto_location_combined.team = auto_do_combined.team
 
+        LEFT JOIN robot_role_combined
+            ON auto_location_combined.team = robot_role_combined.team
+
+         LEFT JOIN role_rating
+            ON auto_location_combined.team = role_rating.team
+
+        LEFT JOIN aim_rating
+            ON auto_location_combined.team = aim_rating.team
+
+        LEFT JOIN hopper_rating
+            ON auto_location_combined.team = hopper_rating.team
+        
+        LEFT JOIN shoot_rating
+            ON auto_location_combined.team = shoot_rating.team
+
         ORDER BY auto_location_combined.teamNumber
-        `).all(comp, comp)
+        `).all(comp, comp, comp, comp, comp, comp, comp)
 
         return(data2);
     }
