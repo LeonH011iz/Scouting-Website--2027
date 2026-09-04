@@ -111,7 +111,7 @@ function getSearchData(comp){
             SELECT
                 rr.teamNumber,
                 rr.teamNumber || ' - ' || rr.teamName AS team,
-                ROUND(AVG(roleRating), 2) AS roleRating
+                ROUND(AVG(rr.roleRating), 2) AS roleRating
             FROM scoutingData rr
             WHERE rr.comp = ?
             GROUP BY rr.teamNumber, rr.teamName
@@ -121,7 +121,7 @@ function getSearchData(comp){
             SELECT
                 ar.teamNumber,
                 ar.teamNumber || ' - ' || ar.teamName AS team,
-                ROUND(AVG(aimRating), 2) AS aimRating
+                ROUND(AVG(ar.aimRating), 2) AS aimRating
             FROM scoutingData ar
             WHERE ar.comp = ?
             GROUP BY ar.teamNumber, ar.teamName
@@ -131,7 +131,7 @@ function getSearchData(comp){
             SELECT
                 hr.teamNumber,
                 hr.teamNumber || ' - ' || hr.teamName AS team,
-                ROUND(AVG(hopperRating), 2) AS hopperRating
+                ROUND(AVG(hr.hopperRating), 2) AS hopperRating
             FROM scoutingData hr
             WHERE hr.comp = ?
             GROUP BY hr.teamNumber, hr.teamName
@@ -141,10 +141,69 @@ function getSearchData(comp){
             SELECT
                 sr.teamNumber,
                 sr.teamNumber || ' - ' || sr.teamName AS team,
-                ROUND(AVG(shootRating), 2) AS shootRating
+                ROUND(AVG(sr.shootRating), 2) AS shootRating
             FROM scoutingData sr
             WHERE sr.comp = ?
             GROUP BY sr.teamNumber, sr.teamName
+        ),
+
+        carried_question AS (
+            SELECT
+            c.teamNumber,
+            c.teamNumber || ' - ' || c.teamName AS team,
+            c.carry AS carry,
+            count(*) as carry_count
+            FROM scoutingData c
+            WHERE c.comp = ?
+           GROUP BY c.teamNumber, c.teamName, c.carry
+        ),
+
+        carried_question_totals AS (
+            SELECT
+                team,
+                SUM(carry_count) AS total
+            FROM carried_question
+            GROUP BY team
+        ),
+
+        travel_pref AS (
+            SELECT
+            t.teamNumber,
+            t.teamNumber || ' - ' || t.teamName AS team,
+            tp.value AS travel,
+            count(*) as travel_count
+        From scoutingData t,
+            json_each(t.travel) tp
+            WHERE t.comp = ?
+           GROUP BY t.teamNumber, t.teamName, tp.value
+        ),
+
+        travel_pref_totals AS (
+            SELECT
+                team,
+                SUM(travel_count) AS total
+            FROM travel_pref
+            GROUP BY team
+        ),
+
+        robot_climb AS (
+            SELECT
+            rc.teamNumber,
+            rc.teamNumber || ' - ' || rc.teamName AS team,
+            cc.value AS climb,
+            count(*) as climb_count
+            From scoutingData rc,
+                json_each(rc.climb) cc
+            WHERE rc.comp = ?
+           GROUP BY rc.teamNumber, rc.teamName, cc.value
+        ),
+
+        robot_climb_totals AS (
+            SELECT 
+                team, 
+                SUM(climb_count) AS total
+            FROM robot_climb
+            GROUP BY team
         ),
 
         auto_location_combined AS (
@@ -162,10 +221,10 @@ function getSearchData(comp){
         FROM auto_location
         JOIN auto_location_totals
             ON auto_location.team = auto_location_totals.team
-        GROUP BY auto_location.team
-    ),
-
-    auto_do_combined AS (
+        GROUP BY auto_location.teamNumber, auto_location.team
+      ),
+        
+        auto_do_combined AS (
         SELECT
             auto_do.teamNumber,
             auto_do.team,
@@ -180,7 +239,7 @@ function getSearchData(comp){
         FROM auto_do
         JOIN auto_do_totals
             ON auto_do.team = auto_do_totals.team
-        GROUP BY auto_do.team
+        GROUP BY auto_do.teamNumber, auto_do.team
         ),
 
         robot_role_combined AS (
@@ -198,8 +257,62 @@ function getSearchData(comp){
             FROM robot_role
             JOIN robot_role_totals
                 ON robot_role.team = robot_role_totals.team
-            GROUP BY robot_role.team
-        )
+            GROUP BY robot_role.teamNumber, robot_role.team
+        ),
+
+        carried_question_combined AS (
+        SELECT
+            carried_question.teamNumber,
+            carried_question.team,
+            GROUP_CONCAT(
+                carried_question.carry || ': ' ||
+                ROUND(
+                    carried_question.carry_count * 100.0
+                    / carried_question_totals.total,
+                    2
+                ) || '%'
+            ) AS carry
+        FROM carried_question
+        JOIN carried_question_totals
+            ON carried_question.team = carried_question_totals.team
+        GROUP BY carried_question.teamNumber, carried_question.team
+        ),
+
+        travel_pref_combined AS (
+        SELECT
+            travel_pref.teamNumber,
+            travel_pref.team,
+            GROUP_CONCAT(
+                travel_pref.travel || ': ' ||
+                ROUND(
+                    travel_pref.travel_count * 100.0
+                    /travel_pref_totals.total,
+                    2
+                ) || '%'
+            ) AS travel
+        FROM travel_pref
+        JOIN travel_pref_totals
+            ON travel_pref.team = travel_pref_totals.team
+        GROUP BY travel_pref.teamNumber, travel_pref.team
+        ),
+
+        robot_climb_combined AS (
+        SELECT
+            robot_climb.teamNumber,
+            robot_climb.team,
+            GROUP_CONCAT(
+                robot_climb.climb || ': ' ||
+                ROUND(
+                    robot_climb.climb_count * 100.0
+                    / robot_climb_totals.total,
+                    2
+                ) || '%'
+            ) AS robot_climb
+        FROM robot_climb
+        JOIN robot_climb_totals
+            ON robot_climb.team = robot_climb_totals.team
+        GROUP BY robot_climb.teamNumber, robot_climb.team
+      )
 
         SELECT
         auto_location_combined.teamNumber,
@@ -210,7 +323,10 @@ function getSearchData(comp){
         role_rating.roleRating,
         aim_rating.aimRating,
         hopper_rating.hopperRating,
-        shoot_rating.shootRating
+        shoot_rating.shootRating,
+        carried_question_combined.carry,
+        travel_pref_combined.travel,
+        robot_climb_combined.robot_climb
 
         FROM auto_location_combined
 
@@ -232,8 +348,19 @@ function getSearchData(comp){
         LEFT JOIN shoot_rating
             ON auto_location_combined.team = shoot_rating.team
 
+        LEFT JOIN carried_question_combined
+            ON auto_location_combined.team = carried_question_combined.team
+        
+        LEFT JOIN travel_pref_combined
+            ON auto_location_combined.team = travel_pref_combined.team
+        
+        LEFT JOIN robot_climb_combined
+            ON auto_location_combined.team = robot_climb_combined.team
+        
+            
+
         ORDER BY auto_location_combined.teamNumber
-        `).all(comp, comp, comp, comp, comp, comp, comp)
+        `).all(comp, comp, comp, comp, comp, comp, comp, comp, comp, comp)
 
         return(data2);
     }
